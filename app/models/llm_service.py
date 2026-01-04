@@ -58,25 +58,25 @@ class LLMExplainer:
             for name, importance in top_factors
         ])
         
-        prompt = f"""Ты - AI-аналитик образовательной CRM системы Softclub. 
-Твоя задача - объяснить администратору, почему студент находится в зоне риска отчисления.
+        prompt = f"""You are an AI Analyst for the Softclub Educational CRM system. 
+Your task is to explain to an administrator why a student is at risk of dropping out.
 
-Данные студента:
-- Посещаемость: {student_data['attendance_rate']:.1f}%
-- Выполнение ДЗ: {student_data['homework_completion']:.1f}%
+Student Data:
+- Attendance: {student_data['attendance_rate']:.1f}%
+- Homework Completion: {student_data['homework_completion']:.1f}%
 
-- Средний балл тестов: {student_data['test_avg_score']:.1f}
-- Пропущено занятий подряд: {student_data['missed_classes_streak']} занятий
-- Активность общения: {student_data['communication_activity']} взаимодействий
-- Дней в системе: {student_data['days_enrolled']} дней
+- Average Test Score: {student_data['test_avg_score']:.1f}
+- Consecutive Missed Classes: {student_data['missed_classes_streak']} classes
+- Communication Activity: {student_data['communication_activity']} interactions
+- Days Enrolled: {student_data['days_enrolled']} days
 
-Уровень риска: {risk_level}
+Risk Level: {risk_level}
 
-Главные факторы риска (по важности):
+Key Risk Factors (by importance):
 {factors_text}
 
-Напиши краткое объяснение (максимум 3 предложения) на русском языке, почему этот студент имеет такой уровень риска.
-Используй конкретные цифры из данных. Пиши простым языком для администратора."""
+Write a brief explanation (max 3 sentences) in English explaining why this student has this risk level.
+Use specific numbers from the data. Write in simple language for an administrator."""
 
         try:
             response = self.client.chat.completions.create(
@@ -110,36 +110,36 @@ class LLMExplainer:
                 "urgency": "high/medium/low"
             }
         """
-        prompt = f"""Ты - AI-советник по удержанию студентов в IT-академии Softclub.
-Предложи ОДНО наиболее эффективное действие для удержания студента.
+        prompt = f"""You are an AI Retention Advisor for Softclub IT Academy.
+Suggest ONE most effective action to retain the student.
 
-Информация о студенте:
-- Уровень риска: {risk_level}
-- Посещаемость: {student_data['attendance_rate']:.1f}%
-- Выполнение ДЗ: {student_data['homework_completion']:.1f}%
+Student Information:
+- Risk Level: {risk_level}
+- Attendance: {student_data['attendance_rate']:.1f}%
+- Homework Completion: {student_data['homework_completion']:.1f}%
 
-- Пропущено подряд: {student_data['missed_classes_streak']} занятий
-- Активность общения: {student_data['communication_activity']} взаимодействий
+- Consecutive Missed Classes: {student_data['missed_classes_streak']} classes
+- Communication Activity: {student_data['communication_activity']} interactions
 
-Доступные действия:
-1. "Звонок от ментора" - личный звонок от преподавателя
-2. "WhatsApp напоминание" - автоматическое напоминание
-3. "Встреча с ментором" - назначить личную встречу
-4. "Дополнительная поддержка" - предложить помощь с материалами
-5. "Гибкий план оплаты" - пересмотреть условия оплаты
-6. "Ничего не предпринимать" - студент справляется отлично, вмешательство не требуется
+Available Actions:
+1. "Mentor Call" - personal call from the instructor
+2. "WhatsApp Reminder" - automated reminder
+3. "Mentor Meeting" - schedule a personal meeting
+4. "Additional Support" - offer help with materials
+5. "Flexible Payment Plan" - revise payment terms
+6. "Do Nothing" - student is doing excellent, no intervention needed
 
-ВАЖНО: Если уровень риска "Low" и показатели высокие (Good/Excellent), выбирай "Ничего не предпринимать" или "Похвалить". Не предлагай звонки и встречи тем, у кого всё хорошо.
+IMPORTANT: If Risk Level is "Low" and metrics are high (Good/Excellent), choose "Do Nothing" or praise. Do not suggest calls or meetings for students who are doing well.
 
-Верни ТОЛЬКО валидный JSON в формате:
+Return ONLY valid JSON in format:
 {{
-  "action": "точное название действия из списка выше",
-  "reason": "краткое обоснование (1-2 предложения) на русском",
+  "action": "exact action name from the list above",
+  "reason": "brief justification (1-2 sentences) in English",
   "success_probability": 0.65,
   "urgency": "high/medium/low"
 }}
 
-Urgency должен быть: "high", "medium" или "low"."""
+Urgency must be: "high", "medium" or "low"."""
 
         try:
             response = self.client.chat.completions.create(
@@ -154,16 +154,16 @@ Urgency должен быть: "high", "medium" или "low"."""
             
             # Валидация и дефолтные значения
             return {
-                "action": result.get("action", "Звонок от ментора"),
-                "reason": result.get("reason", "Требуется личный контакт"),
+                "action": result.get("action", "Mentor Call"),
+                "reason": result.get("reason", "Personal contact required"),
                 "success_probability": min(max(result.get("success_probability", 0.5), 0), 1),
                 "urgency": result.get("urgency", "medium")
             }
         except Exception as e:
             # Fallback рекомендация
             return {
-                "action": "Звонок от ментора",
-                "reason": f"Рекомендация по умолчанию (ошибка LLM: {str(e)})",
+                "action": "Mentor Call",
+                "reason": f"Default recommendation (LLM error: {str(e)})",
                 "success_probability": 0.60,
                 "urgency": "high" if risk_level == "High" else "medium"
             }
@@ -171,12 +171,12 @@ Urgency должен быть: "high", "medium" или "low"."""
     def _translate_feature(self, feature_name: str) -> str:
         """Переводит название фичи на русский"""
         translations = {
-            'attendance_rate': 'Посещаемость',
-            'homework_completion': 'Выполнение ДЗ',
+            'attendance_rate': 'Attendance Rate',
+            'homework_completion': 'Homework Completion',
 
-            'test_avg_score': 'Средний балл',
-            'communication_activity': 'Активность общения',
-            'days_enrolled': 'Длительность обучения',
-            'missed_classes_streak': 'Пропуски подряд'
+            'test_avg_score': 'Average Test Score',
+            'communication_activity': 'Communication Activity',
+            'days_enrolled': 'Days Enrolled',
+            'missed_classes_streak': 'Consecutive Missed Classes'
         }
         return translations.get(feature_name, feature_name)
