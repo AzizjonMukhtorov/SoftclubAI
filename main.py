@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from app.core.config import get_settings
 from app.api.routes import router
+from app.api.dashboard_routes import router as dashboard_router
 
 settings = get_settings()
 
@@ -13,6 +15,10 @@ app = FastAPI(
 )
 
 app.add_middleware(
+    TrustedHostMiddleware, allowed_hosts=["*"]
+)
+
+app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
@@ -21,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(dashboard_router, prefix="/api", tags=["Dashboard"])
 
 
 @app.get("/")

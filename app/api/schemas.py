@@ -77,3 +77,44 @@ class StudentRiskListResponse(BaseModel):
     """Ответ со списком студентов и их рисками"""
     total: int
     students: List[RiskAssessment]
+
+
+# Dashboard Models
+
+class RiskDistribution(BaseModel):
+    low: int
+    medium: int
+    high: int
+    total: int
+
+class RiskTrendItem(BaseModel):
+    week: str
+    date: str
+    low: int
+    medium: int
+    high: int
+
+class RootCauseItem(BaseModel):
+    factor: str
+    value: float
+    color: str
+
+class ActionEffectivenessItem(BaseModel):
+    action: str
+    successRate: float
+    color: str
+
+class DashboardStats(BaseModel):
+    totalStudents: int
+    atRiskStudents: int
+    riskChange: int
+    avgConfidence: float
+    actionsThisWeek: int
+    successfulActions: int
+
+class DashboardResponse(BaseModel):
+    riskDistribution: RiskDistribution
+    riskTrend: List[RiskTrendItem]
+    rootCauses: List[RootCauseItem]
+    actionsEffectiveness: List[ActionEffectivenessItem]
+    stats: DashboardStats

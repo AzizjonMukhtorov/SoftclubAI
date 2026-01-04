@@ -5,9 +5,13 @@ from app.db.models import Student as DBStudent
 from app.api.schemas import Student, StudentFeatures
 
 
-def get_students() -> List[Student]:
+def get_students(db: Session = None) -> List[Student]:
     """Получить всех студентов из БД"""
-    db = SessionLocal()
+    should_close = False
+    if db is None:
+        db = SessionLocal()
+        should_close = True
+        
     try:
         db_students = db.query(DBStudent).all()
         
@@ -29,7 +33,8 @@ def get_students() -> List[Student]:
             for db_student in db_students
         ]
     finally:
-        db.close()
+        if should_close:
+            db.close()
 
 
 def get_student_by_id(student_id: int) -> Student:
