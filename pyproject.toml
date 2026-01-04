@@ -12,6 +12,10 @@ dependencies = [
     "xgboost>=2.0.0",
     "scikit-learn>=1.5.0",
     "numpy>=1.26.0",
+    "pandas>=2.0.0",
     "groq>=0.13.0",
     "python-dotenv>=1.0.1",
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "alembic>=1.13.0",
 ]

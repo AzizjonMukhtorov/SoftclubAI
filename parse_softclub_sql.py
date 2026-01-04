@@ -108,16 +108,32 @@ def calculate_features(students_df, progress_df, student_groups_df):
             else:
                 break
         
-        # TARGET: churned (0 = остался, 1 = ушел/закончил)
-        try:
-            status = int(student['Status'])
-            # 0 = Active → остался (0)
-            # 1 = Graduated → ушел (1) - больше не платит!
-            # 2 = Dropped → ушел (1)
-            # 3 = Expelled → ушел (1)
-            churned = 0 if status == 0 else 1
-        except:
-            churned = 0
+        # TARGET: churned - используем StudentGroupStatus из StudentGroups!
+        # StudentGroupStatus:
+        #   0 = Active в группе
+        #   1 = Graduated (закончил successfully)
+        #   2 = Dropped/Expelled (ОТЧИСЛЕН!) ← ЭТО НАША ЦЕЛЬ!
+        #   3 = Unknown/Other
+        
+        churned = 0  # По умолчанию
+        
+        # Проверяем StudentGroupStatus
+        student_group = student_groups_df[student_groups_df['StudentId'] == student_id]
+        if len(student_group) > 0:
+            try:
+                # Берем последний статус студента (если несколько групп)
+                last_group_status = int(student_group.iloc[-1]['StudentGroupStatus'])
+                # Статус 2 = отчислен!
+                churned = 1 if last_group_status == 2 else 0
+            except:
+                churned = 0
+        else:
+            # Если нет в StudentGroups, используем Students.Status как fallback
+            try:
+                status = int(student['Status'])
+                churned = 1 if status in [2, 3] else 0
+            except:
+                churned = 0
         
         features_list.append({
             'student_id': student_id,
