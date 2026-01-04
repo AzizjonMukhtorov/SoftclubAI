@@ -64,8 +64,7 @@ class LLMExplainer:
 Данные студента:
 - Посещаемость: {student_data['attendance_rate']:.1f}%
 - Выполнение ДЗ: {student_data['homework_completion']:.1f}%
-- Задержки оплаты: {student_data['payment_delays']} раз
-- Дней с последней оплаты: {student_data['days_since_last_payment']} дней
+
 - Средний балл тестов: {student_data['test_avg_score']:.1f}
 - Пропущено занятий подряд: {student_data['missed_classes_streak']} занятий
 - Активность общения: {student_data['communication_activity']} взаимодействий
@@ -118,7 +117,7 @@ class LLMExplainer:
 - Уровень риска: {risk_level}
 - Посещаемость: {student_data['attendance_rate']:.1f}%
 - Выполнение ДЗ: {student_data['homework_completion']:.1f}%
-- Задержки оплаты: {student_data['payment_delays']} раз
+
 - Пропущено подряд: {student_data['missed_classes_streak']} занятий
 - Активность общения: {student_data['communication_activity']} взаимодействий
 
@@ -171,8 +170,7 @@ Urgency должен быть: "high", "medium" или "low"."""
         translations = {
             'attendance_rate': 'Посещаемость',
             'homework_completion': 'Выполнение ДЗ',
-            'payment_delays': 'Задержки оплаты',
-            'days_since_last_payment': 'Дней без оплаты',
+
             'test_avg_score': 'Средний балл',
             'communication_activity': 'Активность общения',
             'days_enrolled': 'Длительность обучения',

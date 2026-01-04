@@ -18,8 +18,6 @@ class ChurnPredictor:
         self.feature_names = [
             'attendance_rate',
             'homework_completion',
-            'payment_delays',
-            'days_since_last_payment',
             'test_avg_score',
             'communication_activity',
             'days_enrolled',

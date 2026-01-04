@@ -12,8 +12,7 @@ class RiskLevel(str, Enum):
 class StudentFeatures(BaseModel):
     attendance_rate: float = Field(..., ge=0, le=100, description="% посещаемости")
     homework_completion: float = Field(..., ge=0, le=100, description="% выполненных ДЗ")
-    payment_delays: int = Field(..., ge=0, description="Количество задержек оплаты")
-    days_since_last_payment: int = Field(..., ge=0, description="Дней с последней оплаты")
+
     test_avg_score: float = Field(..., ge=0, le=100, description="Средний балл тестов")
     communication_activity: int = Field(..., ge=0, description="Активность общения")
     days_enrolled: int = Field(..., ge=0, description="Дней в системе")
@@ -24,8 +23,7 @@ class StudentFeatures(BaseModel):
             "example": {
                 "attendance_rate": 75.5,
                 "homework_completion": 80.0,
-                "payment_delays": 1,
-                "days_since_last_payment": 15,
+
                 "test_avg_score": 72.3,
                 "communication_activity": 12,
                 "days_enrolled": 90,
