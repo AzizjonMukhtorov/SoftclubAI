@@ -14,10 +14,9 @@ class Student(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     course = Column(String(255), nullable=False)
     
+    # 6 ML features
     attendance_rate = Column(Float, nullable=False)
     homework_completion = Column(Float, nullable=False)
-    payment_delays = Column(Integer, nullable=False, default=0)
-    days_since_last_payment = Column(Integer, nullable=False, default=0)
     test_avg_score = Column(Float, nullable=False)
     communication_activity = Column(Integer, nullable=False, default=0)
     days_enrolled = Column(Integer, nullable=False, default=0)

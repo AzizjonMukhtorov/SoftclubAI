@@ -88,7 +88,7 @@ def train_on_real_data():
     print("\n💾 Сохранение модели...")
     os.makedirs('models/trained', exist_ok=True)
     model_path = 'models/trained/churn_model.json'
-    model.save_model(model_path)
+    model.get_booster().save_model(model_path)  # Исправлено!
     print(f"   ✅ Модель сохранена: {model_path}")
     
     # Оценка модели

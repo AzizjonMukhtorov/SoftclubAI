@@ -61,18 +61,28 @@ class ChurnPredictor:
         X = self._prepare_features(features)
         dmatrix = xgb.DMatrix(X, feature_names=self.feature_names)
         
-        # Предсказание вероятностей для каждого класса
-        probs = self.model.predict(dmatrix)[0]  # [prob_low, prob_medium, prob_high]
+        # Получаем вероятность отчисления (binary classification)
+        churn_probability = float(self.model.predict(dmatrix)[0])
         
-        risk_class = np.argmax(probs)
-        confidence = float(np.max(probs))
+        # Определяем уровень риска по порогам вероятности
+        # Пороги подобраны на основе распределения реальных данных Softclub
+        if churn_probability < 0.5:
+            risk_level = 'Low'
+            risk_class = 0
+        elif churn_probability < 0.85:
+            risk_level = 'Medium'
+            risk_class = 1
+        else:
+            risk_level = 'High'
+            risk_class = 2
         
-        risk_level = {0: 'Low', 1: 'Medium', 2: 'High'}[risk_class]
+        # Confidence - насколько уверены в предсказании
+        confidence = abs(churn_probability - 0.5) * 2  # 0-1 scale
         
         # Feature importance
         feature_importance = self._get_feature_importance(features)
         
-        return risk_level, confidence, feature_importance
+        return risk_level, float(confidence), feature_importance
     
     def _prepare_features(self, features: Dict) -> np.ndarray:
         """Подготовить фичи для модели"""
@@ -81,18 +91,23 @@ class ChurnPredictor:
     
     def _get_feature_importance(self, features: Dict) -> Dict[str, float]:
         """
-        Получить важность фич из обученной модели
+        Получить индивидуальный вклад каждого признака для конкретного студента
         """
-        # Используем встроенную feature importance из XGBoost
-        importance = self.model.get_score(importance_type='weight')
+        # Получаем глобальную важность признаков из модели
+        try:
+            global_importance = self.model.get_score(importance_type='weight')
+        except:
+            # Если модель не имеет get_score, используем feature_importances
+            global_importance = {}
+            for i, name in enumerate(self.feature_names):
+                global_importance[f'f{i}'] = 1.0 / len(self.feature_names)
         
         # Преобразуем технические имена (f0, f1) в человекочитаемые
         readable_importance = {}
-        for key, value in importance.items():
-            # XGBoost использует f0, f1, f2... вместо имен
+        for key, value in global_importance.items():
             if key.startswith('f'):
                 try:
-                    feature_index = int(key[1:])  # f0 → 0, f1 → 1
+                    feature_index = int(key[1:])
                     if feature_index < len(self.feature_names):
                         feature_name = self.feature_names[feature_index]
                         readable_importance[feature_name] = value
@@ -101,9 +116,29 @@ class ChurnPredictor:
             else:
                 readable_importance[key] = value
         
-        # Нормализуем
-        total = sum(readable_importance.values())
+        # Взвешиваем важность на основе ЗНАЧЕНИЙ признаков студента
+        # Чем ниже значение (хуже показатель), тем больше вклад в риск
+        weighted_importance = {}
+        for feature_name in self.feature_names:
+            global_weight = readable_importance.get(feature_name, 1.0)
+            feature_value = features.get(feature_name, 50.0)
+            
+            # Для признаков, где меньше = хуже (attendance, homework, test_score)
+            if feature_name in ['attendance_rate', 'homework_completion', 'test_avg_score']:
+                # Инвертируем: низкое значение = высокая важность
+                risk_factor = (100 - feature_value) / 100.0
+            # Для missed_classes_streak: больше = хуже
+            elif feature_name == 'missed_classes_streak':
+                risk_factor = min(feature_value / 15.0, 1.0)  # Нормализуем к 0-1
+            # Для остальных используем как есть
+            else:
+                risk_factor = 0.5
+            
+            weighted_importance[feature_name] = global_weight * (0.5 + risk_factor)
+        
+        # Нормализуем к сумме = 1
+        total = sum(weighted_importance.values())
         if total > 0:
-            return {k: v/total for k, v in readable_importance.items()}
+            return {k: v/total for k, v in weighted_importance.items()}
         else:
-            return readable_importance
+            return weighted_importance

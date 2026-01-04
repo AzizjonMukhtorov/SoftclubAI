@@ -6,14 +6,13 @@ from app.api.schemas import Student, StudentFeatures
 
 
 def get_students() -> List[Student]:
+    """Получить всех студентов из БД"""
     db = SessionLocal()
     try:
         db_students = db.query(DBStudent).all()
         
-        # Convert to Pydantic models
-        students = []
-        for db_student in db_students:
-            student = Student(
+        return [
+            Student(
                 id=db_student.id,
                 name=db_student.name,
                 email=db_student.email,
@@ -21,17 +20,14 @@ def get_students() -> List[Student]:
                 features=StudentFeatures(
                     attendance_rate=db_student.attendance_rate,
                     homework_completion=db_student.homework_completion,
-                    payment_delays=db_student.payment_delays,
-                    days_since_last_payment=db_student.days_since_last_payment,
                     test_avg_score=db_student.test_avg_score,
                     communication_activity=db_student.communication_activity,
                     days_enrolled=db_student.days_enrolled,
                     missed_classes_streak=db_student.missed_classes_streak
                 )
             )
-            students.append(student)
-        
-        return students
+            for db_student in db_students
+        ]
     finally:
         db.close()
 
@@ -64,8 +60,6 @@ def get_student_by_id(student_id: int) -> Student:
             features=StudentFeatures(
                 attendance_rate=db_student.attendance_rate,
                 homework_completion=db_student.homework_completion,
-                payment_delays=db_student.payment_delays,
-                days_since_last_payment=db_student.days_since_last_payment,
                 test_avg_score=db_student.test_avg_score,
                 communication_activity=db_student.communication_activity,
                 days_enrolled=db_student.days_enrolled,
