@@ -21,6 +21,8 @@ def get_students(db: Session = None) -> List[Student]:
                 name=db_student.name,
                 email=db_student.email,
                 course=db_student.course,
+                student_course_name=db_student.course,
+                student_phone_number=db_student.phone_number,
                 features=StudentFeatures(
                     attendance_rate=db_student.attendance_rate,
                     homework_completion=db_student.homework_completion,
@@ -62,6 +64,8 @@ def get_student_by_id(student_id: int) -> Student:
             name=db_student.name,
             email=db_student.email,
             course=db_student.course,
+            student_course_name=db_student.course,
+            student_phone_number=db_student.phone_number,
             features=StudentFeatures(
                 attendance_rate=db_student.attendance_rate,
                 homework_completion=db_student.homework_completion,

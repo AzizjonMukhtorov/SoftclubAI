@@ -65,11 +65,11 @@ class ChurnPredictor:
         churn_probability = float(self.model.predict(dmatrix)[0])
         
         # Определяем уровень риска по порогам вероятности
-        # Пороги подобраны на основе распределения реальных данных Softclub
-        if churn_probability < 0.5:
+        # Пороги обновлены для High Recall (0.40 threshold)
+        if churn_probability < 0.40:
             risk_level = 'Low'
             risk_class = 0
-        elif churn_probability < 0.85:
+        elif churn_probability < 0.70:
             risk_level = 'Medium'
             risk_class = 1
         else:

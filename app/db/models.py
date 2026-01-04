@@ -13,6 +13,7 @@ class Student(Base):
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     course = Column(String(255), nullable=False)
+    phone_number = Column(String(50), nullable=True)
     
     # 6 ML features
     attendance_rate = Column(Float, nullable=False)

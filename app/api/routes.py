@@ -61,6 +61,8 @@ async def get_student_risks():
             RiskAssessment(
                 student_id=student.id,
                 student_name=student.name,
+                student_course_name=student.course,
+                student_phone_number=student.student_phone_number,
                 risk_level=risk_level,
                 confidence=round(confidence, 2)
             )

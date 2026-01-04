@@ -38,6 +38,8 @@ class Student(BaseModel):
     name: str
     email: str
     course: str
+    student_course_name: str
+    student_phone_number: Optional[str] = None
     features: StudentFeatures
 
 
@@ -45,6 +47,8 @@ class RiskAssessment(BaseModel):
     """Оценка риска студента"""
     student_id: int
     student_name: str
+    student_course_name: str
+    student_phone_number: Optional[str] = None
     risk_level: RiskLevel
     confidence: float = Field(..., ge=0, le=1, description="Уверенность модели")
 

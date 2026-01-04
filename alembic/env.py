@@ -21,6 +21,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.db.database import Base
+import app.db.models  # Импортируем модели, чтобы они зарегистрировались в Base
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
